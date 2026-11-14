@@ -101,6 +101,7 @@ ngrok http 8000
 | `LLM_PROVIDER` | `gemini` | `gemini` 또는 `anthropic` |
 | `GEMINI_API_KEY` | (없음) | Gemini 사용 시 필수. 없으면 시작 시 경고 로그 |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | 사용할 Gemini 모델 |
+| `GEMINI_THINKING_LEVEL` | `MINIMAL` | Gemini 3 이상의 생각 정도. 낮을수록 빠름. 모델이 지원하지 않는다는 오류가 나면 `LOW`로 |
 | `ANTHROPIC_API_KEY` | (없음) | Claude 사용 시 필수 |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | 사용할 Claude 모델 |
 | `SYNC_WAIT_SEC` | `4.0` | 동기 모드에서 결과를 기다리는 시간(초) |

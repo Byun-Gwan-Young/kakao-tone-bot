@@ -123,7 +123,18 @@ async def test_gemini_is_default_and_builds_request(monkeypatch):
     assert config.max_output_tokens == 700
     # 3 이상 모델은 thinking_level (thinking_budget과 함께 쓰면 오류)
     assert config.thinking_config.thinking_budget is None
-    assert config.thinking_config.thinking_level is not None
+    assert config.thinking_config.thinking_level == "MINIMAL"
+    assert config.automatic_function_calling.disable is True
+
+
+async def test_gemini_thinking_level_is_configurable(monkeypatch):
+    models = _FakeGeminiModels(response=SimpleNamespace(text="✅ 추천", candidates=[]))
+    _fake_gemini(monkeypatch, models)
+    monkeypatch.setenv("GEMINI_THINKING_LEVEL", "low")
+
+    await llm.correct("안녕", "상사", "일반")
+
+    assert models.kwargs["config"].thinking_config.thinking_level == "LOW"
 
 
 async def test_gemini_2_uses_thinking_budget(monkeypatch):

@@ -7,7 +7,14 @@ from fastapi.testclient import TestClient
 
 os.environ["MOCK_LLM"] = "1"
 os.environ.setdefault("MOCK_DELAY", "0.01")
-for _key in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "LLM_PROVIDER"):
+for _key in (
+    "ANTHROPIC_API_KEY",
+    "GEMINI_API_KEY",
+    "GOOGLE_API_KEY",
+    "LLM_PROVIDER",
+    "GEMINI_MODEL",
+    "GEMINI_THINKING_LEVEL",
+):
     os.environ.pop(_key, None)
 
 

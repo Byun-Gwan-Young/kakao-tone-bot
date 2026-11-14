@@ -15,6 +15,8 @@ PROVIDERS = (PROVIDER_GEMINI, PROVIDER_ANTHROPIC)
 
 DEFAULT_PROVIDER = PROVIDER_GEMINI
 DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
+# 생각(thinking) 정도. 낮을수록 빠르다. 모델이 지원하지 않으면 LOW로 바꾼다.
+DEFAULT_GEMINI_THINKING_LEVEL = "MINIMAL"
 DEFAULT_MODEL = "claude-haiku-5-5"
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,7 @@ class Settings:
     llm_provider: str
     gemini_api_key: str | None
     gemini_model: str
+    gemini_thinking_level: str
     anthropic_api_key: str | None
     claude_model: str
     sync_wait_sec: float
@@ -70,6 +73,9 @@ def get_settings() -> Settings:
         llm_provider=_provider(),
         gemini_api_key=os.getenv("GEMINI_API_KEY") or None,
         gemini_model=os.getenv("GEMINI_MODEL") or DEFAULT_GEMINI_MODEL,
+        gemini_thinking_level=(
+            os.getenv("GEMINI_THINKING_LEVEL") or DEFAULT_GEMINI_THINKING_LEVEL
+        ).upper(),
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY") or None,
         claude_model=os.getenv("CLAUDE_MODEL") or DEFAULT_MODEL,
         sync_wait_sec=_float("SYNC_WAIT_SEC", 4.0),

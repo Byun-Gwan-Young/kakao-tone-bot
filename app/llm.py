@@ -23,9 +23,14 @@ MAX_INPUT_LEN = 1000
 MAX_TOKENS = 700
 # 카카오 5초 제한 안에 끝나도록 생각(thinking)을 짧게 한다.
 EFFORT = "low"  # Claude
-GEMINI_THINKING_LEVEL = "LOW"  # Gemini 3 이상
 API_TIMEOUT_SEC = 30.0
 API_MAX_RETRIES = 1
+# Gemini: 요청 1회 제한 시간(초). SDK가 이 값을 Google 서버 마감 시간으로도 보낸다.
+GEMINI_TIMEOUT_SEC = 20.0
+# 일시적인 서버 오류(5xx)면 한 번 더 시도한다 (첫 시도 포함 2회).
+# 429(한도 초과)는 재시도하지 않는다.
+GEMINI_ATTEMPTS = 2
+GEMINI_RETRY_STATUS = [500, 502, 503, 504]
 
 ERROR_MESSAGE = "앗, 문장을 다듬다가 오류가 났어요. 잠시 후 다시 보내 주세요 🙏"
 
@@ -57,16 +62,21 @@ def _get_gemini_client() -> genai.Client:
             raise RuntimeError("GEMINI_API_KEY가 설정되지 않았습니다")
         _gemini_client = genai.Client(
             api_key=api_key,
-            http_options=genai_types.HttpOptions(timeout=int(API_TIMEOUT_SEC * 1000)),
+            http_options=genai_types.HttpOptions(
+                timeout=int(GEMINI_TIMEOUT_SEC * 1000),
+                retry_options=genai_types.HttpRetryOptions(
+                    attempts=GEMINI_ATTEMPTS, http_status_codes=GEMINI_RETRY_STATUS
+                ),
+            ),
         )
     return _gemini_client
 
 
-def _gemini_thinking_config(model: str) -> genai_types.ThinkingConfig:
+def _gemini_thinking_config(settings: Settings) -> genai_types.ThinkingConfig:
     """2.x 모델은 thinking_budget, 3 이상은 thinking_level로 생각을 줄인다 (둘을 함께 쓰면 오류)."""
-    if model.startswith(("gemini-2.", "gemini-1.")):
+    if settings.gemini_model.startswith(("gemini-2.", "gemini-1.")):
         return genai_types.ThinkingConfig(thinking_budget=0)
-    return genai_types.ThinkingConfig(thinking_level=GEMINI_THINKING_LEVEL)
+    return genai_types.ThinkingConfig(thinking_level=settings.gemini_thinking_level)
 
 
 async def _call_gemini(settings: Settings, user_prompt: str) -> str:
@@ -76,7 +86,9 @@ async def _call_gemini(settings: Settings, user_prompt: str) -> str:
         config=genai_types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
             max_output_tokens=MAX_TOKENS,
-            thinking_config=_gemini_thinking_config(settings.gemini_model),
+            thinking_config=_gemini_thinking_config(settings),
+            # 도구를 쓰지 않으므로 자동 함수 호출(AFC)은 끈다.
+            automatic_function_calling=genai_types.AutomaticFunctionCallingConfig(disable=True),
         ),
     )
     output = (response.text or "").strip()
