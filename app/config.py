@@ -14,7 +14,7 @@ PROVIDER_ANTHROPIC = "anthropic"
 PROVIDERS = (PROVIDER_GEMINI, PROVIDER_ANTHROPIC)
 
 DEFAULT_PROVIDER = PROVIDER_GEMINI
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
 DEFAULT_MODEL = "claude-haiku-5-5"
 
 logger = logging.getLogger(__name__)

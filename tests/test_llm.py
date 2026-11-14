@@ -116,25 +116,25 @@ async def test_gemini_is_default_and_builds_request(monkeypatch):
 
     assert result == "🎯 받는 사람: 교수님  |  📌 상황: 결석·지각·연차\n\n✅ 추천\n좋아요"
     kw = models.kwargs
-    assert kw["model"] == "gemini-2.5-flash"
+    assert kw["model"] == "gemini-3.8-flash"
     assert '"""\n' + "가" * 1000 + '\n"""' in kw["contents"]
     config = kw["config"]
     assert config.system_instruction == llm.SYSTEM_PROMPT
     assert config.max_output_tokens == 700
-    # 2.x 모델은 thinking_budget=0
-    assert config.thinking_config.thinking_budget == 0
-    assert config.thinking_config.thinking_level is None
+    # 3 이상 모델은 thinking_level (thinking_budget과 함께 쓰면 오류)
+    assert config.thinking_config.thinking_budget is None
+    assert config.thinking_config.thinking_level is not None
 
 
-async def test_gemini_3_uses_thinking_level(monkeypatch):
+async def test_gemini_2_uses_thinking_budget(monkeypatch):
     models = _FakeGeminiModels(response=SimpleNamespace(text="✅ 추천", candidates=[]))
-    _fake_gemini(monkeypatch, models, model_name="gemini-3.5-flash")
+    _fake_gemini(monkeypatch, models, model_name="gemini-2.5-flash")
 
     await llm.correct("안녕", "상사", "일반")
 
     tc = models.kwargs["config"].thinking_config
-    assert tc.thinking_budget is None
-    assert tc.thinking_level is not None
+    assert tc.thinking_budget == 0
+    assert tc.thinking_level is None
 
 
 @pytest.mark.parametrize(

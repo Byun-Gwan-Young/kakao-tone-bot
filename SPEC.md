@@ -30,9 +30,9 @@
 - Python 3.11+
 - FastAPI + uvicorn
 - LLM: `LLM_PROVIDER`로 선택
-  - `gemini` (기본): `google-genai` 공식 SDK, 기본 모델 `gemini-2.5-flash` (무료 요금제 사용 가능)
+  - `gemini` (기본): `google-genai` 공식 SDK, 기본 모델 `gemini-3.8-flash` (무료 요금제 사용 가능)
   - `anthropic`: `anthropic` 공식 SDK (`AsyncAnthropic`), 기본 모델 `claude-haiku-5-5`
-  - 변경 이력: 처음에는 Claude만 쓰도록 했으나, Claude API 키가 없어 무료로 쓸 수 있는 Gemini를 기본으로 바꾸고 Claude는 선택지로 남겼다.
+  - 변경 이력: 처음에는 Claude만 쓰도록 했으나, Claude API 키가 없어 무료로 쓸 수 있는 Gemini를 기본으로 바꾸고 Claude는 선택지로 남겼다. 처음 기본 모델 `gemini-2.5-flash`는 새 사용자에게 제공이 중단되어(404) `gemini-3.8-flash`로 바꿨다.
 - `httpx` (카카오 콜백 전송)
 - 테스트: `pytest`, `pytest-asyncio`, FastAPI `TestClient`
 - 린트/포맷: `ruff`
@@ -197,7 +197,7 @@
 |---|---|---|
 | `LLM_PROVIDER` | `gemini` | `gemini` 또는 `anthropic` |
 | `GEMINI_API_KEY` | (없음) | Gemini 사용 시 필수. 없으면 시작 시 경고 로그 |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | |
 | `ANTHROPIC_API_KEY` | (없음) | Claude 사용 시 필수. 없으면 시작 시 경고 로그 |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | |
 | `SYNC_WAIT_SEC` | `4.0` | 동기 모드 대기 시간 |
