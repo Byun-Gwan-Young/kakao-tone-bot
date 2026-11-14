@@ -29,7 +29,10 @@
 
 - Python 3.11+
 - FastAPI + uvicorn
-- `anthropic` 공식 SDK (`AsyncAnthropic`), 기본 모델 `claude-haiku-5-5`
+- LLM: `LLM_PROVIDER`로 선택
+  - `gemini` (기본): `google-genai` 공식 SDK, 기본 모델 `gemini-2.5-flash` (무료 요금제 사용 가능)
+  - `anthropic`: `anthropic` 공식 SDK (`AsyncAnthropic`), 기본 모델 `claude-haiku-5-5`
+  - 변경 이력: 처음에는 Claude만 쓰도록 했으나, Claude API 키가 없어 무료로 쓸 수 있는 Gemini를 기본으로 바꾸고 Claude는 선택지로 남겼다.
 - `httpx` (카카오 콜백 전송)
 - 테스트: `pytest`, `pytest-asyncio`, FastAPI `TestClient`
 - 린트/포맷: `ruff`
@@ -44,7 +47,7 @@
 │   ├── main.py          # FastAPI 앱, /skill, / (헬스체크)
 │   ├── kakao.py         # 카카오 요청 파싱 + 응답 JSON 생성 함수
 │   ├── router.py        # 사용자 발화 → 명령/설정/교정 분기 로직
-│   ├── llm.py           # Claude 호출 (mock 모드 포함)
+│   ├── llm.py           # LLM 호출: Gemini/Claude (mock 모드 포함)
 │   ├── prompts.py       # 받는 사람/상황 목록, 시스템 프롬프트
 │   ├── state.py         # 사용자별 설정 저장소 (인터페이스 + 메모리 구현)
 │   └── config.py        # 환경변수 로딩
@@ -179,7 +182,7 @@
     (주의할 점 한 줄)
     ```
 - 사용자 프롬프트에는 받는 사람 라벨과 설명, 상황 라벨과 설명, 원문(`"""`로 감쌈)을 넣는다.
-- `max_tokens=700`
+- 출력 토큰 상한 700 (Claude `max_tokens`, Gemini `max_output_tokens`). 5초 제한을 위해 생각(thinking)을 줄인다 (Claude `effort=low`, Gemini 2.x `thinking_budget=0`, 3 이상 `thinking_level=LOW`).
 - 최종 답장 = `🎯 받는 사람: X  |  📌 상황: Y` + 빈 줄 + 모델 출력.
 - API 오류가 나도 예외를 밖으로 던지지 않는다. 로그를 남기고 "앗, 문장을 다듬다가 오류가 났어요. 잠시 후 다시 보내 주세요 🙏"를 반환한다.
 - `MOCK_LLM=1`이면 API를 호출하지 않고 정해진 가짜 응답을 반환한다 (`MOCK_DELAY`초 대기, 기본 0.2초). 테스트와 CI에서는 항상 mock을 쓴다.
@@ -192,7 +195,10 @@
 ## 6. 설정 (`app/config.py`, `.env.example`)
 | 변수 | 기본값 | 설명 |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | (없음) | mock이 아닐 때 필수. 없으면 시작 시 경고 로그 |
+| `LLM_PROVIDER` | `gemini` | `gemini` 또는 `anthropic` |
+| `GEMINI_API_KEY` | (없음) | Gemini 사용 시 필수. 없으면 시작 시 경고 로그 |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | |
+| `ANTHROPIC_API_KEY` | (없음) | Claude 사용 시 필수. 없으면 시작 시 경고 로그 |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | |
 | `SYNC_WAIT_SEC` | `4.0` | 동기 모드 대기 시간 |
 | `MOCK_LLM` | `0` | `1`이면 가짜 응답 |
@@ -225,7 +231,7 @@
 - `Dockerfile`: python:3.11-slim, `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}`
 - README에 다음 두 경로를 안내한다:
   - 로컬 테스트: `uvicorn` + `ngrok http 8000`
-  - 상시 운영: Render 또는 Railway (GitHub 저장소 연결 → 환경변수 `ANTHROPIC_API_KEY` 설정)
+  - 상시 운영: Render 또는 Railway (GitHub 저장소 연결 → 환경변수 `GEMINI_API_KEY`(또는 `ANTHROPIC_API_KEY`) 설정)
 
 ## 10. README에 들어갈 카카오 설정 순서
 1. 카카오톡 채널 관리자센터(center-pf.kakao.com)에서 채널 생성
@@ -235,7 +241,7 @@
 5. (선택) 웰컴 블록도 같은 스킬로 연결
 6. 배포 후 실제 채널에서 테스트
 7. (선택) 설정 → AI 챗봇 관리에서 'AI 챗봇 전환'(콜백) 신청. 승인되면 폴백 블록에서 콜백을 켠다. 코드 수정은 필요 없다. 콜백은 봇 테스트 창에서 완전히 지원되지 않으니 배포 후 확인한다.
-8. 개인정보 안내: 사용자 문장이 Anthropic API로 전송된다는 점을 채널 소개에 적어 둘 것.
+8. 개인정보 안내: 사용자 문장이 교정을 위해 외부 AI API(Google Gemini 또는 Anthropic)로 전송된다는 점을 채널 소개에 적어 둘 것. Gemini 무료 요금제는 입력 내용이 Google 제품 개선에 쓰일 수 있으므로 이 점도 함께 알린다.
 
 ## 11. 작업 순서 (단계마다 테스트 통과 후 커밋)
 1. 프로젝트 뼈대: 디렉터리 구조, requirements, `.gitignore`, `.env.example`, ruff 설정, 빈 CI
@@ -245,7 +251,7 @@
 5. `llm.py` (mock 포함, 오류 처리)
 6. `main.py` 동기/콜백 모드 + `test_timeout_callback.py`
 7. Dockerfile, README
-8. 마지막 점검: `ruff check .`, `pytest -q` 전부 통과. 실제 API 키가 있으면 `scripts/try_real.py`로 예시 문장 5개(교수님/결석, 상사/조의, 거래처/부탁, 친구/축하, 선배/감사)를 돌려 출력 형식을 눈으로 확인
+8. 마지막 점검: `ruff check .`, `pytest -q` 전부 통과. 실제 API 키(Gemini 또는 Claude)가 있으면 `scripts/try_real.py`로 예시 문장 5개(교수님/결석, 상사/조의, 거래처/부탁, 친구/축하, 선배/감사)를 돌려 출력 형식을 눈으로 확인
 
 커밋 메시지는 한국어, `feat:`, `test:`, `chore:`, `docs:` 접두어를 쓴다.
 
