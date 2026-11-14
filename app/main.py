@@ -47,9 +47,13 @@ async def lifespan(app: FastAPI):
     )
     logging.getLogger().setLevel(settings.log_level)
     if settings.mock_llm:
-        logger.info("MOCK_LLM=1: Claude API를 호출하지 않고 가짜 응답을 씁니다")
-    elif not settings.anthropic_api_key:
-        logger.warning("ANTHROPIC_API_KEY가 설정되지 않았습니다. 교정 요청이 실패합니다")
+        logger.info("MOCK_LLM=1: LLM API를 호출하지 않고 가짜 응답을 씁니다")
+    else:
+        logger.info("LLM 제공자: %s", settings.llm_provider)
+        if not settings.api_key:
+            logger.warning(
+                "%s가 설정되지 않았습니다. 교정 요청이 실패합니다", settings.api_key_name
+            )
     app.state.store = MemoryStateStore()
     yield
     for task in list(_background_tasks):

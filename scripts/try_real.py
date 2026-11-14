@@ -1,9 +1,10 @@
-"""실제 Claude API로 예시 문장 5개를 교정해 출력 형식을 눈으로 확인하는 스크립트.
+"""실제 LLM API로 예시 문장 5개를 교정해 출력 형식을 눈으로 확인하는 스크립트.
 
-사용법 (저장소 루트에서):
-    ANTHROPIC_API_KEY=... python scripts/try_real.py
+사용법 (저장소 루트에서, .env 또는 환경변수에 키를 넣은 뒤. .env는 자동으로 읽는다):
+    GEMINI_API_KEY=... python scripts/try_real.py
+    LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... python scripts/try_real.py
 
-테스트/CI에서는 실행하지 않는다. 실제 API 비용이 든다.
+테스트/CI에서는 실행하지 않는다. 실제 API를 호출하므로 비용이나 무료 한도가 쓰인다.
 """
 
 from __future__ import annotations
@@ -13,9 +14,18 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+try:  # uvicorn[standard]에 포함된 python-dotenv로 .env를 읽는다 (이미 설정된 값은 유지)
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env")
+except ImportError:
+    pass
 
 from app import llm  # noqa: E402
+from app.config import get_settings  # noqa: E402
 
 EXAMPLES = [
     ("교수님", "결석·지각·연차", "교수님 저 내일 몸살나서 수업 못갈거같아요 과제는 메일로 낼게요"),
@@ -30,9 +40,11 @@ async def main() -> int:
     if os.getenv("MOCK_LLM") == "1":
         print("MOCK_LLM=1 이면 실제 API를 호출하지 않습니다. MOCK_LLM을 끄고 실행하세요.")
         return 1
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        print("ANTHROPIC_API_KEY가 없습니다. 키를 설정한 뒤 실행하세요.")
+    settings = get_settings()
+    if not settings.api_key:
+        print(f"{settings.api_key_name}가 없습니다. 키를 설정한 뒤 실행하세요.")
         return 1
+    print(f"LLM 제공자: {settings.llm_provider}")
 
     for target, situation, text in EXAMPLES:
         print("=" * 60)
