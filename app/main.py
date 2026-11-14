@@ -129,4 +129,3 @@ async def skill(request: Request) -> dict:
     except Exception:  # noqa: BLE001 - 어떤 경우에도 500을 내지 않는다
         logger.exception("스킬 처리 중 예기치 못한 오류")
         return text_response(INTERNAL_ERROR_TEXT, MAIN_QR)
-
