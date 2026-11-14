@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 
 os.environ["MOCK_LLM"] = "1"
 os.environ.setdefault("MOCK_DELAY", "0.01")
-os.environ.pop("ANTHROPIC_API_KEY", None)
+for _key in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "LLM_PROVIDER"):
+    os.environ.pop(_key, None)
 
 
 @pytest.fixture
