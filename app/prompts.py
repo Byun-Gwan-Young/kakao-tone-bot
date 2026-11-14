@@ -64,3 +64,8 @@ def build_user_prompt(target: str, situation: str, text: str) -> str:
         f"상황: {situation} ({situation_desc})\n\n"
         f'원문:\n"""\n{text}\n"""'
     )
+
+
+def settings_line(target: str, situation: str) -> str:
+    """현재 설정을 한 줄로 보여준다. 교정 결과 머리말로도 쓴다."""
+    return f"🎯 받는 사람: {target}  |  📌 상황: {situation}"
