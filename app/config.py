@@ -15,8 +15,8 @@ PROVIDERS = (PROVIDER_GEMINI, PROVIDER_ANTHROPIC)
 
 DEFAULT_PROVIDER = PROVIDER_GEMINI
 DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
-# 생각(thinking) 정도. 낮을수록 빠르다. 모델이 지원하지 않으면 LOW로 바꾼다.
-DEFAULT_GEMINI_THINKING_LEVEL = "MINIMAL"
+# 생각(thinking) 정도. 낮을수록 빠르다. gemini-3.8-flash는 MINIMAL을 지원하지 않아 LOW를 쓴다.
+DEFAULT_GEMINI_THINKING_LEVEL = "LOW"
 DEFAULT_MODEL = "claude-haiku-5-5"
 
 logger = logging.getLogger(__name__)

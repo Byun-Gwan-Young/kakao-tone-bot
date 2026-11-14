@@ -182,7 +182,7 @@
     (주의할 점 한 줄)
     ```
 - 사용자 프롬프트에는 받는 사람 라벨과 설명, 상황 라벨과 설명, 원문(`"""`로 감쌈)을 넣는다.
-- 출력 토큰 상한 700 (Claude `max_tokens`, Gemini `max_output_tokens`). 5초 제한을 위해 생각(thinking)을 줄인다 (Claude `effort=low`, Gemini 2.x `thinking_budget=0`, 3 이상 `thinking_level=MINIMAL`). Gemini는 요청당 20초 제한, 5xx 오류는 1회 재시도.
+- 출력 토큰 상한 700 (Claude `max_tokens`, Gemini `max_output_tokens`). 5초 제한을 위해 생각(thinking)을 줄인다 (Claude `effort=low`, Gemini 2.x `thinking_budget=0`, 3 이상 `thinking_level=LOW`). Gemini는 요청당 20초 제한, 5xx 오류는 1회 재시도.
 - 최종 답장 = `🎯 받는 사람: X  |  📌 상황: Y` + 빈 줄 + 모델 출력.
 - API 오류가 나도 예외를 밖으로 던지지 않는다. 로그를 남기고 "앗, 문장을 다듬다가 오류가 났어요. 잠시 후 다시 보내 주세요 🙏"를 반환한다.
 - `MOCK_LLM=1`이면 API를 호출하지 않고 정해진 가짜 응답을 반환한다 (`MOCK_DELAY`초 대기, 기본 0.2초). 테스트와 CI에서는 항상 mock을 쓴다.
@@ -198,7 +198,7 @@
 | `LLM_PROVIDER` | `gemini` | `gemini` 또는 `anthropic` |
 | `GEMINI_API_KEY` | (없음) | Gemini 사용 시 필수. 없으면 시작 시 경고 로그 |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | |
-| `GEMINI_THINKING_LEVEL` | `MINIMAL` | Gemini 3 이상의 생각 정도 (응답 속도용) |
+| `GEMINI_THINKING_LEVEL` | `LOW` | Gemini 3 이상의 생각 정도 (응답 속도용) |
 | `ANTHROPIC_API_KEY` | (없음) | Claude 사용 시 필수. 없으면 시작 시 경고 로그 |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | |
 | `SYNC_WAIT_SEC` | `4.0` | 동기 모드 대기 시간 |
