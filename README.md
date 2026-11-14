@@ -58,7 +58,7 @@ Windows cmd에서는 `copy .env.example .env`를 씁니다.
 무료 요금제 주의사항:
 - 분당·하루 요청 수 한도가 있고, **모든 사용자가 키 하나의 한도를 함께 씁니다.** 한도를 넘으면 사용자에게 "잠시 후 다시 보내 주세요" 안내가 나갑니다. 현재 한도는 AI Studio에서 확인하세요.
 - 무료 요금제는 **입력 내용이 Google 제품 개선에 쓰일 수 있습니다.** 아래 카카오 설정 8번처럼 채널 소개에 꼭 알려 주세요. 결제를 연결한 유료 요금제는 그렇지 않습니다.
-- 기본 모델은 `gemini-3.8-flash`입니다. Google이 모델을 바꾸거나 종료하면 AI Studio에서 무료로 쓸 수 있는 Flash 모델 이름을 확인해 `GEMINI_MODEL`에 넣으세요.
+- 기본 모델은 `gemini-3.5-flash-lite`입니다. Google이 모델을 바꾸거나 종료하면 AI Studio에서 무료로 쓸 수 있는 Flash 모델 이름을 확인해 `GEMINI_MODEL`에 넣으세요.
 
 ### Claude로 바꾸기
 
@@ -100,8 +100,8 @@ ngrok http 8000
 |---|---|---|
 | `LLM_PROVIDER` | `gemini` | `gemini` 또는 `anthropic` |
 | `GEMINI_API_KEY` | (없음) | Gemini 사용 시 필수. 없으면 시작 시 경고 로그 |
-| `GEMINI_MODEL` | `gemini-3.8-flash` | 사용할 Gemini 모델 |
-| `GEMINI_THINKING_LEVEL` | `LOW` | Gemini 3 이상의 생각 정도 (`MINIMAL`/`LOW`/`MEDIUM`/`HIGH`). 낮을수록 빠름. 모델마다 지원하는 값이 다름 (`gemini-3.8-flash`는 `MINIMAL` 미지원) |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | 사용할 Gemini 모델 |
+| `GEMINI_THINKING_LEVEL` | `LOW` | Gemini 3 이상의 생각 정도 (`MINIMAL`/`LOW`/`MEDIUM`/`HIGH`). 낮을수록 빠름. 모델마다 지원하는 값이 다름 (예: `gemini-3.8-flash`는 `MINIMAL` 미지원) |
 | `ANTHROPIC_API_KEY` | (없음) | Claude 사용 시 필수 |
 | `CLAUDE_MODEL` | `claude-haiku-5-5` | 사용할 Claude 모델 |
 | `SYNC_WAIT_SEC` | `4.0` | 동기 모드에서 결과를 기다리는 시간(초) |

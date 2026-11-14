@@ -14,8 +14,8 @@ PROVIDER_ANTHROPIC = "anthropic"
 PROVIDERS = (PROVIDER_GEMINI, PROVIDER_ANTHROPIC)
 
 DEFAULT_PROVIDER = PROVIDER_GEMINI
-DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
-# 생각(thinking) 정도. 낮을수록 빠르다. gemini-3.8-flash는 MINIMAL을 지원하지 않아 LOW를 쓴다.
+DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
+# 생각(thinking) 정도. 낮을수록 빠르다. 모델마다 지원 값이 달라 대부분 지원하는 LOW를 쓴다.
 DEFAULT_GEMINI_THINKING_LEVEL = "LOW"
 DEFAULT_MODEL = "claude-haiku-5-5"
 

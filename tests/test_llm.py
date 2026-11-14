@@ -116,7 +116,7 @@ async def test_gemini_is_default_and_builds_request(monkeypatch):
 
     assert result == "🎯 받는 사람: 교수님  |  📌 상황: 결석·지각·연차\n\n✅ 추천\n좋아요"
     kw = models.kwargs
-    assert kw["model"] == "gemini-3.8-flash"
+    assert kw["model"] == "gemini-3.5-flash-lite"
     assert '"""\n' + "가" * 1000 + '\n"""' in kw["contents"]
     config = kw["config"]
     assert config.system_instruction == llm.SYSTEM_PROMPT
